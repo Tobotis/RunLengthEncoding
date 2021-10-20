@@ -61,31 +61,31 @@ class _InteractiveGridState extends State<InteractiveGrid> {
               const SizedBox(
                 height: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      color: Colors.black,
-                      alignment: Alignment.center,
-                      child: const Text("1"),
+              Wrap(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.black,
+                    alignment: Alignment.center,
+                    child: const Text("1"),
+                  ),
+                  Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.white,
+                    alignment: Alignment.center,
+                    child: const Text(
+                      "0",
+                      style: TextStyle(color: Colors.black),
                     ),
-                    Container(
-                      width: 50,
-                      height: 50,
-                      color: Colors.white,
-                      alignment: Alignment.center,
-                      child: const Text(
-                        "0",
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    ElevatedButton.icon(
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton.icon(
                         onPressed: () {
                           setState(() {
                             pixel = List.generate(
@@ -94,10 +94,10 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                         },
                         icon: const Icon(Icons.check),
                         label: const Text("Best Case")),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    ElevatedButton.icon(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton.icon(
                         onPressed: () {
                           setState(() {
                             pixel = List.generate(maxRow * maxColumn,
@@ -106,10 +106,10 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                         },
                         icon: const Icon(Icons.delete),
                         label: const Text("Worst Case")),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Row(
+              Wrap(
                 children: [
                   TextSlider(
                     title: "Columns",
@@ -166,16 +166,16 @@ class _InteractiveGridState extends State<InteractiveGrid> {
           ),
         ),
         Expanded(
-          flex: 2,
           child: SingleChildScrollView(
             controller: sc,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
                     "Run-Length-Encoding",
-                    style: TextStyle(fontSize: 50),
+                    style: TextStyle(fontSize: 40),
                   ),
                 ),
                 Padding(
@@ -187,7 +187,7 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                         children: [
                           const Text(
                             "Without RLE",
-                            style: TextStyle(fontSize: 25),
+                            style: TextStyle(fontSize: 20),
                           ),
                           Text(
                             bit.toString() +
@@ -196,7 +196,7 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                                 byte.toString() +
                                 "Byte",
                             style: const TextStyle(
-                              fontSize: 25,
+                              fontSize: 20,
                             ),
                           ),
                         ],
@@ -207,7 +207,7 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                           (index) => Text(
                             (pixel[index] ? "1" : "0") +
                                 ((index + 1) % 4 == 0 ? " " : ""),
-                            style: const TextStyle(fontSize: 18),
+                            style: const TextStyle(fontSize: 15),
                           ),
                         ),
                       ),
@@ -223,7 +223,7 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                         children: [
                           const Text(
                             "With RLE",
-                            style: TextStyle(fontSize: 25),
+                            style: TextStyle(fontSize: 20),
                           ),
                           Text(
                             rleBit.toString() +
@@ -234,7 +234,7 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                                 rleByte.toString() +
                                 "Byte",
                             style: const TextStyle(
-                              fontSize: 25,
+                              fontSize: 20,
                             ),
                           ),
                         ],
@@ -244,7 +244,7 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                             .map(
                               (e) => Text(
                                 e + " ",
-                                style: const TextStyle(fontSize: 18),
+                                style: const TextStyle(fontSize: 15),
                               ),
                             )
                             .toList(),
@@ -258,8 +258,8 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Compression (rle size/normal size): ",
-                        style: TextStyle(fontSize: 25),
+                        "Compression: ",
+                        style: TextStyle(fontSize: 20),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -270,7 +270,7 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                                         .toStringAsFixed(3))
                                     .toString() +
                                 "%",
-                            style: const TextStyle(fontSize: 40),
+                            style: const TextStyle(fontSize: 30),
                             softWrap: true,
                           ),
                           Text(
@@ -279,7 +279,7 @@ class _InteractiveGridState extends State<InteractiveGrid> {
                                         .toStringAsFixed(3))
                                     .toString() +
                                 "%",
-                            style: const TextStyle(fontSize: 40),
+                            style: const TextStyle(fontSize: 30),
                             softWrap: true,
                           ),
                         ],
