@@ -1,11 +1,11 @@
 {
-    "name": "run_length_encoding",
-    "short_name": "run_length_encoding",
+    "name": "Run-Length-Encoding",
+    "short_name": "Run-Length-Encoding",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Simulation of the Run-Length-Encoding data compression method.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

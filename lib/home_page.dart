@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:js' as js;
 import 'package:line_icons/line_icons.dart';
-import 'package:run_length_encoding/data.dart';
 import 'package:run_length_encoding/interactive_grid.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,7 +18,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () {
-              js.context.callMethod('open', ['https://github.com/tobotis']);
+              js.context.callMethod('open', ['https://github.com/tobotis/RunLengthEncoding']);
             },
             icon: const Icon(LineIcons.github),
           ),
@@ -40,13 +39,10 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
-        leading: const Image(
-          image: AssetImage(logo),
-        ),
-        title: const Text("Tobotis"),
+        title: const Text("tobotis.com", style: TextStyle(fontWeight: FontWeight.bold),),
         centerTitle: false,
       ),
-      body: InteractiveGrid(),
+      body: const InteractiveGrid(),
     );
   }
 }
