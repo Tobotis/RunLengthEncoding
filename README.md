@@ -1,3 +1,3 @@
 # RunLengthEncoding
 
-Interactive Simulation of Imagecompression with Run-Length-Encoding
+Interactive Simulation of Image-Compression with Run-Length-Encoding
