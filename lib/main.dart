@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:run_length_encoding/constants.dart';
-import 'package:run_length_encoding/home_page.dart';
+import 'package:run_length_encoding/interactive_grid.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,19 +13,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Run-Length-Encoding',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-        brightness: Brightness.light,
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ButtonStyle(
-            shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(borderRadius: defaultBorderRadius),
-            ),
-          ),
-        ),
-      ),
       darkTheme: ThemeData(
-        primarySwatch: Colors.blueGrey,
+        primarySwatch: Colors.indigo,
         brightness: Brightness.dark,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
@@ -36,7 +25,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.dark,
-      home: const HomePage(),
+      home: const InteractiveGrid(),
     );
   }
 }

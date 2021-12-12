@@ -5,7 +5,7 @@
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Simulation of the Run-Length-Encoding data compression method.",
+    "description": "Interactive simulation of the Run-Length-Encoding data compression method.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,297 +1,264 @@
 import 'dart:math';
-
+import 'dart:js' as js;
 import 'package:flutter/material.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:run_length_encoding/constants.dart';
 import 'package:run_length_encoding/text_slider.dart';
 
 class InteractiveGrid extends StatefulWidget {
-  const InteractiveGrid({Key? key}) : super(key: key);
+  const InteractiveGrid({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _InteractiveGridState createState() => _InteractiveGridState();
 }
 
 class _InteractiveGridState extends State<InteractiveGrid> {
-  int maxRow = 20;
-  int maxColumn = 20;
-  List<bool> pixel = List.generate(20 * 20, (index) => false);
-  int rows = 8;
-  int columns = 8;
+  static int maxRes = 30;
+  List<bool> pixel = List.generate(maxRes * maxRes, (index) => false);
+  int res = 8;
   int codeBitLength = 4;
-  bool useRLE = true;
   ScrollController sc = ScrollController();
   @override
   Widget build(BuildContext context) {
-    List<String> rle =
-        calcRLE(pixel.sublist(0, (rows * columns)), codeBitLength);
+    List<String> rle = calcRLE(pixel.sublist(0, (res * res)), codeBitLength);
 
     int rleBit = (rle.length * codeBitLength);
     int rleByte = (rleBit / 8).ceil();
-    int bit = (rows * columns);
+    int bit = (res * res);
     int byte = (bit / 8).ceil();
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            children: [
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: rows,
-                  children: List.generate(rows * columns, (index) {
-                    Color color = pixel[index] ? Colors.black : Colors.white;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          pixel[index] = !pixel[index];
-                        });
-                      },
-                      child: AnimatedContainer(
-                        duration: defaultPixelDuration,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                          ),
-                          color: color,
+    return Scaffold(
+      body: Row(
+        children: [
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: res,
+              children: List.generate(res * res, (index) {
+                Color color = pixel[index] ? Colors.black : Colors.white;
+                return MouseRegion(
+                  onEnter: (event) {
+                    if (event.buttons == 1) {
+                      setState(() {
+                        pixel[index] = !pixel[index];
+                      });
+                    }
+                  },
+                  child: GestureDetector(
+                    onTap: () => setState(() {
+                      pixel[index] = !pixel[index];
+                    }),
+                    child: AnimatedContainer(
+                      duration: defaultPixelDuration,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.black,
                         ),
+                        color: color,
                       ),
-                    );
-                  }),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Wrap(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.black,
-                    alignment: Alignment.center,
-                    child: const Text("1"),
-                  ),
-                  Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.white,
-                    alignment: Alignment.center,
-                    child: const Text(
-                      "0",
-                      style: TextStyle(color: Colors.black),
+                      alignment: Alignment.center,
                     ),
                   ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            pixel = List.generate(
-                                maxRow * maxColumn, (index) => false);
-                          });
-                        },
-                        icon: const Icon(Icons.check),
-                        label: const Text("Best Case")),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            pixel = List.generate(maxRow * maxColumn,
-                                (index) => (index % 2) == 0 ? false : true);
-                          });
-                        },
-                        icon: const Icon(Icons.delete),
-                        label: const Text("Worst Case")),
-                  ),
-                ],
-              ),
-              Wrap(
-                children: [
-                  TextSlider(
-                    title: "Columns",
-                    value: rows,
-                    max: maxRow,
-                    min: 2,
-                    onChanged: (int val) {
-                      setState(() {
-                        rows = val;
-                      });
-                    },
-                  ),
-                  TextSlider(
-                    title: "Rows",
-                    value: columns,
-                    max: maxColumn,
-                    min: 2,
-                    onChanged: (int val) {
-                      setState(() {
-                        columns = val;
-                      });
-                    },
-                  ),
-                  /*Row(
-              children: [
-                Checkbox(
-                    fillColor: MaterialStateProperty.all(
-                        Theme.of(context).primaryColor),
-                    value: useRLE,
-                    onChanged: (bool? val) => {
-                          setState(() {
-                            useRLE = val ?? useRLE;
-                          })
-                        }),
-                const Text("Use RLE"),
-              ],
-            ),*/
-                  useRLE
-                      ? TextSlider(
-                          title: "Encoding-Bits",
-                          value: codeBitLength,
-                          max: 10,
-                          min: 2,
-                          onChanged: (int val) {
-                            setState(() {
-                              codeBitLength = val;
-                            });
-                          },
-                        )
-                      : const SizedBox.shrink(),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            controller: sc,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    "Run-Length-Encoding",
-                    style: TextStyle(fontSize: 40),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Without RLE",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Text(
-                            bit.toString() +
-                                "Bit " +
-                                (((rows * columns) % 8) != 0 ? "≈ " : "= ") +
-                                byte.toString() +
-                                "Byte",
-                            style: const TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Wrap(
-                        children: List.generate(
-                          (rows * columns),
-                          (index) => Text(
-                            (pixel[index] ? "1" : "0") +
-                                ((index + 1) % 4 == 0 ? " " : ""),
-                            style: const TextStyle(fontSize: 15),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "With RLE",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Text(
-                            rleBit.toString() +
-                                "Bit " +
-                                (((rle.length * codeBitLength) % 8) != 0
-                                    ? "≈ "
-                                    : "= ") +
-                                rleByte.toString() +
-                                "Byte",
-                            style: const TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Wrap(
-                        children: rle
-                            .map(
-                              (e) => Text(
-                                e + " ",
-                                style: const TextStyle(fontSize: 15),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Compression: ",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            "Bit: " +
-                                double.parse(((rleBit / bit) * 100)
-                                        .toStringAsFixed(3))
-                                    .toString() +
-                                "%",
-                            style: const TextStyle(fontSize: 30),
-                            softWrap: true,
-                          ),
-                          Text(
-                            "Byte: " +
-                                double.parse(((rleByte / byte) * 100)
-                                        .toStringAsFixed(3))
-                                    .toString() +
-                                "%",
-                            style: const TextStyle(fontSize: 30),
-                            softWrap: true,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                );
+              }),
             ),
           ),
-        ),
-      ],
+          Expanded(
+            child: SingleChildScrollView(
+              controller: sc,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      "Run-Length-Encoding",
+                      style: TextStyle(fontSize: 30),
+                    ),
+                  ),
+                  Wrap(
+                    spacing: 5,
+                    runSpacing: 5,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    runAlignment: WrapAlignment.spaceBetween,
+                    alignment: WrapAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              pixel = List.generate(
+                                  maxRes * maxRes, (index) => false);
+                            });
+                          },
+                          child: const Text("Clear")),
+                      ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              pixel = List.generate(maxRes * maxRes,
+                                  (index) => (index % 2) == 0 ? false : true);
+                            });
+                          },
+                          child: const Text("Worst Case")),
+                      IconButton(
+                        onPressed: () {
+                          js.context.callMethod('open',
+                              ['https://github.com/tobotis/RunLengthEncoding']);
+                        },
+                        icon: const Icon(LineIcons.github),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  TextSlider(
+                    title: "Resolution",
+                    value: res,
+                    max: maxRes,
+                    min: 2,
+                    onChanged: (int val) {
+                      setState(() {
+                        res = val;
+                      });
+                    },
+                  ),
+                  TextSlider(
+                    title: "Encoding-Bits",
+                    value: codeBitLength,
+                    max: 10,
+                    min: 2,
+                    onChanged: (int val) {
+                      setState(() {
+                        codeBitLength = val;
+                      });
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Compression: ",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              "Bit: " +
+                                  double.parse(((rleBit / bit) * 100)
+                                          .toStringAsFixed(3))
+                                      .toString() +
+                                  "%",
+                              style: const TextStyle(fontSize: 30),
+                              softWrap: true,
+                            ),
+                            Text(
+                              "Byte: " +
+                                  double.parse(((rleByte / byte) * 100)
+                                          .toStringAsFixed(3))
+                                      .toString() +
+                                  "%",
+                              style: const TextStyle(fontSize: 30),
+                              softWrap: true,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  res < 15
+                      ? Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Without RLE",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                      Text(
+                                        bit.toString() +
+                                            "Bit " +
+                                            (((res * res) % 8) != 0
+                                                ? "≈ "
+                                                : "= ") +
+                                            byte.toString() +
+                                            "Byte",
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Wrap(
+                                    children: List.generate(
+                                      (res * res),
+                                      (index) => Text(
+                                        (pixel[index] ? "1" : "0") +
+                                            ((index + 1) % 4 == 0 ? " " : ""),
+                                        style: const TextStyle(fontSize: 15),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "With RLE",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                      Text(
+                                        rleBit.toString() +
+                                            "Bit " +
+                                            (((rle.length * codeBitLength) %
+                                                        8) !=
+                                                    0
+                                                ? "≈ "
+                                                : "= ") +
+                                            rleByte.toString() +
+                                            "Byte",
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Wrap(
+                                    children: rle
+                                        .map(
+                                          (e) => Text(
+                                            e + " ",
+                                            style:
+                                                const TextStyle(fontSize: 15),
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                      : const Text("Resolution is too high for more details"),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
